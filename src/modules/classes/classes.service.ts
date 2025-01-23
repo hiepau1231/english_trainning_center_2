@@ -1,51 +1,29 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Class } from './entities/class.entity';
 import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
-import { ClassTeacher } from './entities/class-teacher.entity';
+import { ClassRepository } from './repositories/class.repository';
 
 @Injectable()
 export class ClassesService {
   constructor(
-    @InjectRepository(Class)
-    private classRepository: Repository<Class>,
-    @InjectRepository(ClassTeacher)
-    private classTeacherRepository: Repository<ClassTeacher>,
+    private readonly classRepository: ClassRepository,
   ) {}
 
   async create(createClassDto: CreateClassDto) {
-    const newClass = this.classRepository.create(createClassDto);
-    return await this.classRepository.save(newClass);
+    return await this.classRepository.createFromDto(createClassDto);
+  }
+
+  async bulkCreate(createClassDtos: CreateClassDto[]) {
+    return await this.classRepository.bulkCreateClasses(createClassDtos);
   }
 
   async findAll() {
-    return await this.classRepository.find({
-      where: { is_deleted: false },
-      relations: [
-        'course',
-        'classroom',
-        'classTeachers',
-        'classTeachers.teacher',
-        'schedules',
-        'shifts',
-      ],
-    });
+    return await this.classRepository.findActiveClasses();
   }
 
   async findOne(id: number) {
-    const classEntity = await this.classRepository.findOne({
-      where: { id, is_deleted: false },
-      relations: [
-        'course',
-        'classroom',
-        'classTeachers',
-        'classTeachers.teacher',
-        'schedules',
-        'shifts',
-      ],
-    });
+    const classEntity = await this.classRepository.findWithRelations(id);
 
     if (!classEntity) {
       throw new NotFoundException(`Class with ID ${id} not found`);
@@ -56,51 +34,42 @@ export class ClassesService {
 
   async update(id: number, updateClassDto: UpdateClassDto) {
     const classEntity = await this.findOne(id);
-    Object.assign(classEntity, updateClassDto);
-    return await this.classRepository.save(classEntity);
+    return await this.classRepository.update(id, updateClassDto);
   }
 
   async softDelete(id: number) {
-    const classEntity = await this.findOne(id);
-    classEntity.is_deleted = true;
-    classEntity.deleted_at = new Date();
-    return await this.classRepository.save(classEntity);
+    await this.findOne(id); // Verify exists
+    await this.classRepository.softDelete(id);
   }
 
   async restore(id: number) {
     const classEntity = await this.classRepository.findOne({
-      where: { id, is_deleted: true },
+      where: { id, is_deleted: true }
     });
 
     if (!classEntity) {
       throw new NotFoundException(`Class with ID ${id} not found`);
     }
 
-    classEntity.is_deleted = false;
-    classEntity.deleted_at = null;
-    return await this.classRepository.save(classEntity);
+    return await this.classRepository.restore(id);
   }
 
   async getDeletedClasses() {
-    return await this.classRepository.find({
+    return await this.classRepository.findAll({
       where: { is_deleted: true },
-      relations: ['course', 'classroom', 'teachers', 'schedules', 'shifts'],
+      relations: [
+        'course',
+        'classroom',
+        'classTeachers',
+        'classTeachers.teacher',
+        'schedules',
+        'shifts'
+      ]
     });
   }
 
   async findClassDetail(id: number) {
-    const class_ = await this.classRepository
-      .createQueryBuilder('class')
-      .leftJoinAndSelect('class.classTeachers', 'classTeacher')
-      .leftJoinAndSelect('classTeacher.teacher', 'teacher')
-      .leftJoinAndSelect('class.course', 'course')
-      .leftJoinAndSelect('class.schedules', 'schedule')
-      .leftJoinAndSelect('class.shifts', 'shift')
-      .leftJoinAndSelect('class.classroom', 'classroom')
-      .leftJoinAndSelect('teacher.levels', 'teacher_level')
-      .where('class.id = :id', { id })
-      .andWhere('class.is_deleted = :isDeleted', { isDeleted: false })
-      .getOne();
+    const class_ = await this.classRepository.findWithRelations(id);
 
     if (!class_) {
       throw new NotFoundException(`Class with ID ${id} not found`);
@@ -121,5 +90,9 @@ export class ClassesService {
       start_date: class_.start_date,
       end_date: class_.end_date,
     };
+  }
+
+  async findByName(className: string) {
+    return await this.classRepository.findByNameWithCache(className);
   }
 }

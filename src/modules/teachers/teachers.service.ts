@@ -1,29 +1,26 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Teacher } from './entities/teacher.entity';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
+import { TeacherRepository } from './repositories/teacher.repository';
 
 @Injectable()
 export class TeachersService {
   constructor(
-    @InjectRepository(Teacher)
-    private teacherRepository: Repository<Teacher>,
+    private readonly teacherRepository: TeacherRepository,
   ) {}
 
-  async create(createTeacherDto: CreateTeacherDto) {
-    const teacher = this.teacherRepository.create(createTeacherDto);
-    return await this.teacherRepository.save(teacher);
+  async create(createTeacherDto: CreateTeacherDto): Promise<Teacher> {
+    return await this.teacherRepository.createFromDto(createTeacherDto);
   }
 
-  async findAll() {
-    return await this.teacherRepository.find({
+  async findAll(): Promise<Teacher[]> {
+    return await this.teacherRepository.findAll({
       where: { is_deleted: false },
       relations: ['classes', 'levels'],
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<Teacher> {
     const teacher = await this.teacherRepository.findOne({
       where: { id, is_deleted: false },
       relations: ['classes', 'levels'],
@@ -36,20 +33,32 @@ export class TeachersService {
     return teacher;
   }
 
-  async update(id: number, updateTeacherDto: Partial<CreateTeacherDto>) {
-    const teacher = await this.findOne(id);
-    Object.assign(teacher, updateTeacherDto);
-    return await this.teacherRepository.save(teacher);
+  async findByName(teacherName: string): Promise<Teacher | null> {
+    return await this.teacherRepository.findByNameWithCache(teacherName);
   }
 
-  async softDelete(id: number) {
-    const teacher = await this.findOne(id);
-    teacher.is_deleted = true;
-    teacher.deleted_at = new Date();
-    return await this.teacherRepository.save(teacher);
+  async bulkCreateTeachers(teacherNames: string[]): Promise<void> {
+    await this.teacherRepository.bulkUpsertTeachers(teacherNames);
   }
 
-  async restore(id: number) {
+  async update(id: number, updateTeacherDto: Partial<CreateTeacherDto>): Promise<Teacher> {
+    await this.findOne(id); // Verify existence
+    return await this.teacherRepository.update(id, {
+      ...updateTeacherDto,
+      updated_at: new Date()
+    });
+  }
+
+  async softDelete(id: number): Promise<void> {
+    await this.findOne(id); // Verify existence
+    await this.teacherRepository.update(id, {
+      is_deleted: true,
+      deleted_at: new Date(),
+      updated_at: new Date()
+    });
+  }
+
+  async restore(id: number): Promise<Teacher> {
     const teacher = await this.teacherRepository.findOne({
       where: { id, is_deleted: true },
     });
@@ -58,26 +67,25 @@ export class TeachersService {
       throw new NotFoundException(`Teacher with ID ${id} not found`);
     }
 
-    teacher.is_deleted = false;
-    teacher.deleted_at = null;
-    return await this.teacherRepository.save(teacher);
+    return await this.teacherRepository.update(id, {
+      is_deleted: false,
+      deleted_at: null,
+      updated_at: new Date()
+    });
   }
 
-  async getTeachersByLevel(teacherName: string) {
-    const teacher = await this.teacherRepository.findOne({
-      where: { teacher_name: teacherName, is_deleted: false },
-      relations: ['levels'],
-    });
+  async getTeachersByLevel(teacherName: string): Promise<Teacher[]> {
+    const teacher = await this.teacherRepository.findByNameWithCache(teacherName);
 
     if (!teacher) {
       return [];
     }
 
-    return await this.teacherRepository
-      .createQueryBuilder('teacher')
-      .leftJoinAndSelect('teacher.levels', 'level')
-      .where('teacher.teacher_name != :teacherName', { teacherName })
-      .andWhere('teacher.is_deleted = :isDeleted', { isDeleted: false })
-      .getMany();
+    return await this.teacherRepository.getTeachersByLevel(teacherName);
+  }
+
+  // Optimized methods for bulk operations
+  async findTeachersByNames(teacherNames: string[]): Promise<Teacher[]> {
+    return await this.teacherRepository.findTeachersByNames(teacherNames);
   }
 }

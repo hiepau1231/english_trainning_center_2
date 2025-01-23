@@ -1,33 +1,28 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Course } from './entities/course.entity';
+import { Course, CourseStatus } from './entities/course.entity';
 import { CreateCourseDto } from './dto/create-course.dto';
+import { CourseRepository } from './repositories/course.repository';
 
 @Injectable()
 export class CoursesService {
   constructor(
-    @InjectRepository(Course)
-    private courseRepository: Repository<Course>,
+    private readonly courseRepository: CourseRepository,
   ) {}
 
   async create(createCourseDto: CreateCourseDto) {
-    const course = this.courseRepository.create(createCourseDto);
-    return await this.courseRepository.save(course);
+    return await this.courseRepository.createFromDto(createCourseDto);
+  }
+
+  async bulkCreate(createCourseDtos: CreateCourseDto[]) {
+    return await this.courseRepository.bulkCreateCourses(createCourseDtos);
   }
 
   async findAll() {
-    return await this.courseRepository.find({
-      where: { is_deleted: false },
-      relations: ['classes'],
-    });
+    return await this.courseRepository.findActiveCourses();
   }
 
   async findOne(id: number) {
-    const course = await this.courseRepository.findOne({
-      where: { id, is_deleted: false },
-      relations: ['classes'],
-    });
+    const course = await this.courseRepository.findWithClasses(id);
 
     if (!course) {
       throw new NotFoundException(`Course with ID ${id} not found`);
@@ -36,30 +31,46 @@ export class CoursesService {
     return course;
   }
 
+  async findByName(courseName: string) {
+    return await this.courseRepository.findByNameWithCache(courseName);
+  }
+
   async update(id: number, updateCourseDto: Partial<CreateCourseDto>) {
-    const course = await this.findOne(id);
-    Object.assign(course, updateCourseDto);
-    return await this.courseRepository.save(course);
+    await this.findOne(id); // Verify exists
+    return await this.courseRepository.update(id, updateCourseDto);
+  }
+
+  async updateStatus(id: number, status: CourseStatus) {
+    await this.findOne(id); // Verify exists
+    return await this.courseRepository.update(id, { status });
+  }
+
+  async bulkUpdateStatus(courseIds: number[], status: CourseStatus) {
+    return await this.courseRepository.bulkUpdateStatus(courseIds, status);
   }
 
   async softDelete(id: number) {
-    const course = await this.findOne(id);
-    course.is_deleted = true;
-    course.deleted_at = new Date();
-    return await this.courseRepository.save(course);
+    await this.findOne(id); // Verify exists
+    await this.courseRepository.softDelete(id);
   }
 
   async restore(id: number) {
     const course = await this.courseRepository.findOne({
-      where: { id, is_deleted: true },
+      where: { id, is_deleted: true }
     });
 
     if (!course) {
       throw new NotFoundException(`Course with ID ${id} not found`);
     }
 
-    course.is_deleted = false;
-    course.deleted_at = null;
-    return await this.courseRepository.save(course);
+    return await this.courseRepository.restore(id);
+  }
+
+  async findByStatus(status: CourseStatus) {
+    return await this.courseRepository.findByStatus(status);
+  }
+
+  async findMultiple(ids: number[]) {
+    return await this.courseRepository.findByIds(ids);
   }
 }

@@ -1,18 +1,40 @@
-import { IsNotEmpty, IsDate, IsOptional } from 'class-validator';
+import { IsInt, IsString, IsDateString, IsNotEmpty, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateScheduleDto {
-  @IsNotEmpty()
-  @IsDate()
-  @Type(() => Date)
-  schedule_date: Date;
+    @IsInt()
+    @IsNotEmpty()
+    classId: number;
 
-  @IsNotEmpty()
-  classroom_id: number;
+    @IsInt()
+    @IsNotEmpty()
+    teacherId: number;
 
-  @IsOptional()
-  class_ids?: number[];
+    @IsInt()
+    @IsNotEmpty()
+    roomId: number;
 
-  @IsOptional()
-  shift_ids?: number[];
+    @IsInt()
+    @Min(0)
+    @Max(6)
+    @IsNotEmpty()
+    dayOfWeek: number;
+
+    @IsString()
+    @IsNotEmpty()
+    startTime: string;
+
+    @IsString()
+    @IsNotEmpty()
+    endTime: string;
+
+    @IsDateString()
+    @IsNotEmpty()
+    @Type(() => Date)
+    startDate: Date;
+
+    @IsDateString()
+    @IsNotEmpty()
+    @Type(() => Date)
+    endDate: Date;
 }
