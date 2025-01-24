@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository, DeepPartial, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
-import { BaseRepository } from '../../../common/repositories/base.repository';
-import { ClassSchedule } from '../entities/class-schedule.entity';
+import { BaseRepository } from '@common/repositories/base.repository';
+import { ClassSchedule } from '@modules/schedules/entities/class-schedule.entity';
 
 export interface ClassTimeSlot {
     dayOfWeek: number;
@@ -29,7 +29,7 @@ export class ClassScheduleRepository extends BaseRepository<ClassSchedule> {
     }
 
     /**
-     * Tạo lịch học mới cho lớp
+     * Create a new class schedule
      */
     async createSchedule(
         classId: number,
@@ -52,7 +52,7 @@ export class ClassScheduleRepository extends BaseRepository<ClassSchedule> {
     }
 
     /**
-     * Kiểm tra xung đột lịch học
+     * Check for schedule conflicts
      */
     async findConflicts(timeSlot: ClassTimeSlot, excludeClassId?: number): Promise<ScheduleConflict[]> {
         const conflicts = await this.classScheduleRepository
@@ -94,7 +94,7 @@ export class ClassScheduleRepository extends BaseRepository<ClassSchedule> {
     }
 
     /**
-     * Lấy lịch học của lớp
+     * Get class schedule
      */
     async getClassSchedule(classId: number): Promise<ClassSchedule[]> {
         return this.classScheduleRepository.find({
@@ -107,13 +107,21 @@ export class ClassScheduleRepository extends BaseRepository<ClassSchedule> {
     }
 
     /**
-     * Lấy lịch dạy của giáo viên
+     * Get teacher schedule
      */
     async getTeacherSchedule(
         teacherId: number,
         startDate: Date,
         endDate: Date
     ): Promise<ClassSchedule[]> {
+        if (!startDate || !endDate) {
+            throw new Error('Start date and end date are required');
+        }
+
+        if (endDate < startDate) {
+            throw new Error('End date must be after start date');
+        }
+
         return this.classScheduleRepository.find({
             where: {
                 teacherId,
@@ -128,13 +136,21 @@ export class ClassScheduleRepository extends BaseRepository<ClassSchedule> {
     }
 
     /**
-     * Lấy lịch sử dụng phòng học
+     * Get room schedule
      */
     async getRoomSchedule(
         roomId: number,
         startDate: Date,
         endDate: Date
     ): Promise<ClassSchedule[]> {
+        if (!startDate || !endDate) {
+            throw new Error('Start date and end date are required');
+        }
+
+        if (endDate < startDate) {
+            throw new Error('End date must be after start date');
+        }
+
         return this.classScheduleRepository.find({
             where: {
                 roomId,
@@ -149,7 +165,7 @@ export class ClassScheduleRepository extends BaseRepository<ClassSchedule> {
     }
 
     /**
-     * Cập nhật thông tin lịch học
+     * Update schedule information
      */
     async updateSchedule(
         scheduleId: number,
@@ -160,14 +176,14 @@ export class ClassScheduleRepository extends BaseRepository<ClassSchedule> {
     }
 
     /**
-     * Xóa lịch học
+     * Delete schedule
      */
     async deleteSchedule(scheduleId: number): Promise<void> {
         await this.classScheduleRepository.delete(scheduleId);
     }
 
     /**
-     * Kiểm tra lịch trống cho việc đề xuất lịch học
+     * Find available slots for schedule suggestions
      */
     async findAvailableSlots(
         teacherId: number,
@@ -175,6 +191,14 @@ export class ClassScheduleRepository extends BaseRepository<ClassSchedule> {
         startDate: Date,
         endDate: Date
     ): Promise<ClassTimeSlot[]> {
+        if (!startDate || !endDate) {
+            throw new Error('Start date and end date are required');
+        }
+
+        if (endDate < startDate) {
+            throw new Error('End date must be after start date');
+        }
+
         // Get all existing schedules for the teacher and room
         const [teacherSchedules, roomSchedules] = await Promise.all([
             this.getTeacherSchedule(teacherId, startDate, endDate),
@@ -182,13 +206,10 @@ export class ClassScheduleRepository extends BaseRepository<ClassSchedule> {
         ]);
 
         // Combine and analyze schedules to find available slots
-        // This is a simplified implementation - actual logic would be more complex
         const availableSlots: ClassTimeSlot[] = [];
         
-        // Example: Find slots on weekdays between 8 AM and 5 PM
-        for (let day = 0; day < 7; day++) {
-            if (day === 0 || day === 6) continue; // Skip weekends
-            
+        // Find slots on weekdays between 8 AM and 5 PM
+        for (let day = 1; day <= 5; day++) { // Monday (1) to Friday (5)
             const slot: ClassTimeSlot = {
                 dayOfWeek: day,
                 startTime: '08:00:00',

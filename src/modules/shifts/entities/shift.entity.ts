@@ -7,8 +7,8 @@ import {
   ManyToOne,
   ManyToMany,
 } from 'typeorm';
-import { Schedule } from '../../schedules/entities/schedule.entity';
-import { Class } from 'src/modules/classes/entities/class.entity';
+import { Schedule } from '@modules/schedules/entities/schedule.entity';
+import { Class } from '@modules/classes/entities/class.entity';
 
 @Entity('shifts')
 export class Shift {

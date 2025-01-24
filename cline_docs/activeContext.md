@@ -2,92 +2,94 @@
 
 ## Những Thay Đổi Gần Đây
 
-1. Hoàn Thành Hệ Thống Lập Lịch ✅
+1. Cập Nhật Tài Liệu
 ```typescript
-// Các thành phần đã triển khai
-- Database Layer
-  + Migration files
-  + Entity definitions
-  + Database indices
+// Tài Liệu API
+- Đã tạo tài liệu API đầy đủ cho các endpoint lịch học
+- Đã thêm tài liệu tiếng Việt
+- Đã lập tài liệu mẫu test
+- Đã thêm hướng dẫn quy ước import
 
-- Repository Layer
-  + TeacherAvailabilityRepository
-  + RoomScheduleRepository
-  + ClassScheduleRepository
-
-- Service Layer
-  + SchedulingService
-  + Conflict checking
-  + Schedule suggestions
-
-- API Layer
-  + DTOs
-  + REST endpoints
-  + Response handling
+// Cơ Sở Hạ Tầng Testing
+- Đã tạo test controller với độ bao phủ đầy đủ
+- Đã triển khai thiết lập test e2e
+- Đã thêm cấu hình cơ sở dữ liệu test
+- Đã tạo dữ liệu mẫu cho test
 ```
 
-2. Triển Khai API Endpoints ✅
+2. Thiết Lập Testing
 ```typescript
-// Các endpoints đã tạo
-POST /schedules/class           // Tạo lịch mới
-GET  /schedules/available-slots // Tìm slots trống
-GET  /schedules/class/:id      // Lấy lịch của lớp
-GET  /schedules/teacher/:id    // Lấy lịch của giáo viên
-GET  /schedules/room/:id       // Lấy lịch của phòng
-PUT  /schedules/:id           // Cập nhật lịch
-DELETE /schedules/:id         // Xóa lịch
+// Cơ Sở Hạ Tầng Test E2E
+- Cấu hình jest-e2e.json
+- Cấu hình cơ sở dữ liệu test
+- Thiết lập dữ liệu mẫu
+- Tiện ích dọn dẹp cơ sở dữ liệu
+
+// Test Controller
+- Test đơn vị cho tất cả endpoint
+- Mock lớp service
+- Test cả trường hợp thành công và thất bại
+```
+
+3. Giải Quyết Import
+```typescript
+// Đã Sửa Cấu Trúc Import
+- Cập nhật teacher.entity.ts để sử dụng path alias
+- Cấu hình đúng path mapping cho test
+- Thêm tài liệu cho quy ước import
 ```
 
 ## Trạng Thái Hiện Tại
-🟢 Giai Đoạn 1: Hoàn Thành Cơ Sở Hạ Tầng
-🟢 Giai Đoạn 2: Hoàn Thành Module Cốt Lõi
-🟢 Giai Đoạn 3: Hoàn Thành Hệ Thống Lập Lịch
-🟡 Giai Đoạn 4: Chuẩn Bị Testing & Documentation
+🟢 Giai Đoạn 1: Hoàn thành tài liệu
+🟢 Giai Đoạn 2: Hoàn thành test controller
+🟡 Giai Đoạn 3: Thiết lập test tích hợp
+
+### Vấn Đề Đang Xử Lý
+1. Thiết lập và cấu hình cơ sở dữ liệu test
+2. Triển khai test tích hợp
+3. Tạo dữ liệu mẫu cho test
 
 ## Các Bước Tiếp Theo
 
-1. Testing Setup
+1. Hoàn Thành Test Tích Hợp
 ```typescript
-// Test cases cần triển khai
-- Unit tests cho repositories
-- Unit tests cho service
-- Integration tests cho API
-- Performance tests cho conflict checking
+// Công việc còn lại
+- Chạy test e2e
+- Kiểm tra tương tác cơ sở dữ liệu
+- Test kịch bản quy trình đầy đủ
 ```
 
-2. API Documentation
+2. Phân Tích Độ Bao Phủ Test
 ```typescript
-// Documentation cần tạo
-- API endpoints
-- Request/Response format
-- Error handling
-- Usage examples
+// Mục tiêu độ bao phủ
+- Xác minh độ bao phủ repository >90%
+- Đảm bảo độ bao phủ service >80%
+- Duy trì độ bao phủ controller >70%
 ```
 
-3. Performance Testing
+3. Cập Nhật Tài Liệu
 ```typescript
-// Metrics cần đo
-- Response time < 200ms
-- Conflict check < 100ms
-- Schedule suggestion < 500ms
+// Tài liệu cuối cùng
+- Thêm kết quả test
+- Cập nhật báo cáo độ bao phủ
+- Hoàn thiện tài liệu API
 ```
 
 ## Ghi Chú Kỹ Thuật
 
-### API Implementation
-- RESTful endpoints
-- Standardized responses
-- Proper error handling
-- Input validation
+### Chiến Lược Testing
+- Test đơn vị với Jest
+- Test E2E với cơ sở dữ liệu riêng
+- Tạo dữ liệu test phù hợp
+- Tự động dọn dẹp
 
-### Business Logic
-- Conflict detection
-- Schedule optimization
-- Availability checking
-- Room allocation
+### Thiết Lập Cơ Sở Dữ Liệu Test
+- Sử dụng cấu hình .env.test
+- Cơ sở dữ liệu test riêng biệt
+- Đồng bộ schema tự động
+- Tạo dữ liệu test mẫu
 
 ### Trọng Tâm Hiện Tại
-1. ✅ Core scheduling system complete
-2. ⏳ Planning test cases
-3. 📝 Preparing API documentation
-4. 📝 Setting up performance tests
+1. 🔄 Thiết lập cơ sở dữ liệu test
+2. 🔄 Triển khai test tích hợp
+3. 📝 Hoàn thiện tài liệu

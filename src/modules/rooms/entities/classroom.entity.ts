@@ -1,5 +1,5 @@
-import { Class } from 'src/modules/classes/entities/class.entity';
-import { Schedule } from 'src/modules/schedules/entities/schedule.entity';
+import { Class } from '@modules/classes/entities/class.entity';
+import { Schedule } from '@modules/schedules/entities/schedule.entity';
 import {
   Entity,
   Column,
@@ -17,7 +17,7 @@ export class Classroom {
   @Column()
   room_name: string;
 
-  @Column({ nullable: true })
+  @Column()
   capacity: number;
 
   @OneToMany(() => Class, (class_) => class_.classroom)

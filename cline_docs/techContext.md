@@ -13,25 +13,55 @@
 - Query Builder optimization
 - Cache layer integration
 
-### Repository Infrastructure
+### Path Alias Configuration
 ```typescript
-// Base Repository Pattern
-- Generic type constraints
-- Built-in caching
-- Bulk operations
-- Transaction support
+// tsconfig.json paths
+{
+  "@modules/*": ["src/modules/*"],
+  "@common/*": ["src/common/*"],
+  "@config/*": ["src/config/*"],
+  "@test/*": ["test/*"]
+}
 
-// Entity Repositories
-- Entity-specific optimizations
-- Custom query methods
-- Performance monitoring
+// Jest module mapper
+{
+  "^@modules/(.*)$": "<rootDir>/src/modules/$1",
+  "^@common/(.*)$": "<rootDir>/src/common/$1",
+  "^@config/(.*)$": "<rootDir>/src/config/$1",
+  "^@test/(.*)$": "<rootDir>/test/$1"
+}
+
+// Jest E2E module mapper
+{
+  "^@modules/(.*)$": "<rootDir>/../src/modules/$1",
+  "^@common/(.*)$": "<rootDir>/../src/common/$1",
+  "^@config/(.*)$": "<rootDir>/../src/config/$1",
+  "^@test/(.*)$": "<rootDir>/$1"
+}
 ```
 
-### API & Xử Lý Dữ Liệu
-- Express.js platform
-- Class-validator & class-transformer
-- DTO validation
-- Multer for uploads
+### Testing Infrastructure
+```typescript
+// Jest Configuration
+- Custom jest.config.js
+- jest-e2e.json for e2e tests
+- Path alias support
+- TypeScript transformation
+- Coverage reporting
+
+// Test Structure
+- Unit tests (/test/unit)
+- E2E tests (/test/e2e)
+- Repository tests
+- Service tests
+- Controller tests
+
+// Test Database
+- Separate test database
+- Environment specific config
+- Automated cleanup
+- Test data seeding
+```
 
 ### Dependencies
 ```json
@@ -42,71 +72,65 @@
     "@nestjs/typeorm": "^10.0.2",
     "mysql2": "^3.12.0",
     "typeorm": "^0.3.20",
-    "bcrypt": "^5.1.1",
-    "multer": "^1.4.5-lts.1",
     "class-validator": "^0.14.1",
     "class-transformer": "^0.5.1"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "supertest": "^7.0.0"
   }
 }
 ```
 
 ## Thiết Lập Phát Triển
 
-### Repository Setup
+### Import Structure
 ```typescript
-// 1. Base Repository
-import { BaseRepository } from '@common/repositories/base.repository';
+// Entity imports
+import { Entity } from '@modules/domain/entities/entity';
 
-// 2. Entity Repository
-@Injectable()
-export class EntityRepository extends BaseRepository<Entity> {
-  constructor(
-    @InjectRepository(Entity)
-    repository: Repository<Entity>
-  ) {
-    super(repository);
-  }
-}
+// Repository imports
+import { Repository } from '@modules/domain/repositories/repository';
 
-// 3. Service Integration
-@Injectable()
-export class EntityService {
-  constructor(
-    private readonly repository: EntityRepository
-  ) {}
-}
+// Service imports
+import { Service } from '@modules/domain/services/service';
 ```
 
-### Database Configuration
+### Test Setup
 ```typescript
-// TypeORM Config
-{
-  type: 'mysql',
-  cache: {
-    type: 'database',
-    duration: 60000 // 1 minute
-  },
-  logging: true,
-  synchronize: false,
-  migrations: ['dist/migrations/*.js']
-}
-```
+// Repository test template
+describe('Repository', () => {
+  let repository: Repository;
+  let typeormRepository: TypeOrmRepository;
 
-### Development Scripts
-```json
-{
-  "scripts": {
-    "build": "nest build",
-    "start": "nest start",
-    "start:dev": "nest start --watch",
-    "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
-    "typeorm": "ts-node ./node_modules/typeorm/cli.js",
-    "migration:create": "npm run typeorm migration:create",
-    "migration:run": "npm run typeorm migration:run",
-    "migration:revert": "npm run typeorm migration:revert"
-  }
-}
+  beforeEach(async () => {
+    // Test module setup
+    // Repository initialization
+    // Mock setup
+  });
+
+  // Test cases
+});
+
+// E2E test template
+describe('API Endpoint', () => {
+  let app: INestApplication;
+  let connection: Connection;
+
+  beforeAll(async () => {
+    // Setup test module
+    // Initialize app
+    // Setup test database
+  });
+
+  afterAll(async () => {
+    // Cleanup database
+    // Close app
+  });
+
+  // Test cases
+});
 ```
 
 ## Ràng Buộc Kỹ Thuật
@@ -115,59 +139,77 @@ export class EntityService {
 ```typescript
 // 1. Entity Requirements
 - Soft delete implementation
-- Audit columns (created_at, updated_at)
+- Audit columns
 - Proper indices
 - Relationship management
 
 // 2. Query Optimization
-- Use query builder for complex queries
-- Implement proper joins
-- Utilize database indices
-- Cache frequent queries
+- Query builder usage
+- Proper joins
+- Index utilization
+- Query caching
 ```
 
-### Performance Requirements
+### Testing Requirements
 ```typescript
-// 1. Caching Strategy
-- Entity-level caching
-- Query result caching
-- Cache invalidation
-- Memory management
-
-// 2. Bulk Operations
-- Batch processing
-- Memory efficient
-- Transaction support
+// 1. Unit Tests
+- Repository operations
+- Service logic
+- Controller endpoints
 - Error handling
+
+// 2. E2E Tests
+- API endpoints
+- Database operations
+- Full workflows
+- Error scenarios
+
+// 3. Test Database
+- Separate config
+- Clean state
+- Seed data
+- Automated cleanup
 ```
 
-### Type Safety
+### Import Structure Rules
 ```typescript
-// 1. Repository Types
-- Generic constraints
-- DTO validation
-- Proper type inference
-- Minimal type assertions
+// 1. Use Path Aliases
+- @modules/* for module imports
+- @common/* for shared code
+- @config/* for configuration
+- @test/* for test utilities
 
-// 2. Error Handling
-- Custom exceptions
-- Type-safe error responses
-- Proper error propagation
+// 2. Avoid Relative Paths
+- No ../../ style imports
+- Clear module boundaries
+- Proper encapsulation
 ```
 
 ## Hướng Dẫn Triển Khai
 
 ### Repository Implementation
 1. Extend BaseRepository
-2. Implement entity-specific methods
-3. Add caching where appropriate
-4. Optimize bulk operations
+2. Use path aliases for imports
+3. Implement entity-specific methods
+4. Add proper tests
 
 ### Service Layer
 1. Use repository methods
 2. Handle business logic
-3. Manage transactions
-4. Implement error handling
+3. Proper error handling
+4. Test coverage
+
+### Testing Guidelines
+1. Use path aliases
+2. Mock external dependencies
+3. Test error cases
+4. Verify type safety
+
+### Test Database Setup
+1. Use .env.test config
+2. Setup test schema
+3. Seed test data
+4. Implement cleanup
 
 ### Performance Monitoring
 1. Query execution time
@@ -175,8 +217,8 @@ export class EntityService {
 3. Memory usage
 4. Response times
 
-### Testing Requirements
-1. Unit tests for repositories
-2. Integration tests for services
-3. Performance benchmarks
-4. Cache validation tests
+### Test Coverage Goals
+1. Repository layer: > 90%
+2. Service layer: > 80%
+3. Controller layer: > 70%
+4. Overall coverage: > 80%

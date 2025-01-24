@@ -9,10 +9,10 @@ import {
   OneToMany,
   JoinTable,
 } from 'typeorm';
-import { Course } from '../../courses/entities/course.entity';
-import { Classroom } from '../../rooms/entities/classroom.entity';
-import { Schedule } from '../../schedules/entities/schedule.entity';
-import { Shift } from '../../shifts/entities/shift.entity';
+import { Course } from '@modules/courses/entities/course.entity';
+import { Classroom } from '@modules/rooms/entities/classroom.entity';
+import { Schedule } from '@modules/schedules/entities/schedule.entity';
+import { Shift } from '@modules/shifts/entities/shift.entity';
 import { ClassTeacher } from './class-teacher.entity';
 
 @Entity('classes')

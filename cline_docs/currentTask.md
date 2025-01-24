@@ -1,110 +1,101 @@
-# Nhiệm Vụ: Triển Khai Hệ Thống Lập Lịch
+# Nhiệm Vụ: Hoàn Thiện Cơ Sở Hạ Tầng Testing
 
 ## Đã Hoàn Thành ✅
 
-### 1. Database Layer
+### 1. Tài Liệu
 ```typescript
-// Migration files
-- teacher_availability
-- room_schedules
-- class_schedules
-- Indices và foreign keys
+// Tài Liệu API
+- Đã lập tài liệu cho các endpoint lịch học ✓
+- Đã thêm mẫu test ✓
+- Đã thêm quy ước import ✓
+- Đã dịch sang tiếng Việt ✓
+
+// Hướng Dẫn Testing
+- Tổ chức test case ✓
+- Mẫu sử dụng mock ✓
+- Yêu cầu độ bao phủ ✓
 ```
 
-### 2. Core Entities
+### 2. Test Controller
 ```typescript
-// Domain models
-- TeacherAvailability
-- RoomSchedule
-- ClassSchedule
+// Triển khai test hoàn chỉnh
+- Đã thiết kế cấu trúc test ✓
+- Đã mock lớp service ✓
+- Đã xác thực request/response ✓
+- Đã xử lý các trường hợp đặc biệt ✓
 ```
 
-### 3. Repository Layer
+### 3. Thiết Lập Test Tích Hợp
 ```typescript
-// Repositories với các chức năng chính
-- TeacherAvailabilityRepository
-  + Quản lý lịch giáo viên
-  + Kiểm tra xung đột
-
-- RoomScheduleRepository
-  + Quản lý phòng học
-  + Xử lý đặt phòng
-
-- ClassScheduleRepository
-  + Quản lý lịch học
-  + Xử lý xung đột
-```
-
-### 4. Service Layer
-```typescript
-// SchedulingService với các chức năng
-- Tạo lịch học mới
-- Kiểm tra xung đột
-- Tìm slots trống
-- Đề xuất lịch phù hợp
+// Cấu hình cơ bản
+- Đã thiết lập jest-e2e.json ✓
+- Đã cấu hình cơ sở dữ liệu test ✓
+- Đã tạo tiện ích test ✓
 ```
 
 ## Nhiệm Vụ Tiếp Theo
 
-### 1. Controller Layer
+### 1. Test Tích Hợp
 ```typescript
-// API Endpoints cần triển khai
-- POST /schedules/class
-- GET /schedules/available-slots
-- GET /schedules/conflicts
-- PUT /schedules/:id
-- DELETE /schedules/:id
+// Test Cơ Sở Dữ Liệu
+- Chạy test e2e
+- Kiểm tra thao tác cơ sở dữ liệu
+- Tạo dữ liệu test mẫu
+- Test quy trình đầy đủ
 
-// DTOs cần tạo
-- CreateScheduleDto
-- UpdateScheduleDto
-- ScheduleResponseDto
+// Độ Bao Phủ Test
+- Kiểm tra độ bao phủ repository
+- Kiểm tra tích hợp service
+- Phân tích các endpoint API
 ```
 
-### 2. Integration Testing
+### 2. Tài Liệu Kết Quả Test
 ```typescript
-// Các test cases
-- Tạo lịch học mới
-- Kiểm tra xung đột
-- Tìm slots trống
-- Cập nhật lịch
-- Xóa lịch
-
-// Performance testing
-- Đo thời gian phản hồi
-- Test đồng thời
+// Báo Cáo Độ Bao Phủ
+- Tạo báo cáo test
+- Ghi lại chỉ số độ bao phủ
+- Cập nhật tài liệu
 ```
 
-### 3. Documentation
-- API documentation
-- Scheduling rules
-- Error handling
-- Integration guide
+### 3. Đánh Giá Cuối Cùng
+```typescript
+// Điểm Kiểm Tra
+- Độ tin cậy của test
+- Đạt mục tiêu độ bao phủ
+- Hoàn thành tài liệu
+- Tất cả file sử dụng path alias
+```
 
 ## Kế Hoạch Triển Khai
 
-### Phase 1: Controller Development (1-2 ngày)
-- [ ] Tạo DTOs
-- [ ] Implement endpoints
-- [ ] Validation pipes
-- [ ] Error handling
+### Giai Đoạn 1: Test Tích Hợp (2-3 ngày)
+- [ ] Chạy bộ test e2e
+- [ ] Sửa lỗi test nếu có
+- [ ] Kiểm tra thao tác cơ sở dữ liệu
+- [ ] Test quy trình đầy đủ
 
-### Phase 2: Testing (1-2 ngày)
-- [ ] Unit tests
-- [ ] Integration tests
-- [ ] Performance tests
-- [ ] Test documentation
+### Giai Đoạn 2: Phân Tích Độ Bao Phủ (1-2 ngày)
+- [ ] Tạo báo cáo độ bao phủ
+- [ ] Xác định khoảng trống độ bao phủ
+- [ ] Thêm test còn thiếu
+- [ ] Cập nhật tài liệu
 
-### Phase 3: Documentation (1 ngày)
-- [ ] API docs
-- [ ] Integration guide
-- [ ] Example usage
+### Giai Đoạn 3: Đánh Giá Cuối (1 ngày)
+- [ ] Xác nhận tất cả test đều pass
+- [ ] Kiểm tra đạt mục tiêu độ bao phủ
+- [ ] Hoàn thành tài liệu
+- [ ] Dọn dẹp code cuối cùng
 
-## Metrics Cần Đạt
-1. API response time < 200ms
-2. Successful schedule creation > 95%
-3. Conflict detection accuracy 100%
-4. Test coverage > 80%
+## Chỉ Số Cần Đạt
+1. Test E2E đều pass
+2. Đạt mục tiêu độ bao phủ
+   - Repository: > 90%
+   - Service: > 80%
+   - Controller: > 70%
+3. Hoàn thành tài liệu
+4. Kết quả test sạch
 
 ## Trạng Thái
-🟡 Core implementation hoàn thành, chuẩn bị triển khai Controller layer
+✅ Đã hoàn thành tài liệu và test controller
+✅ Đã chuẩn bị thiết lập test tích hợp
+🟡 Cần chạy và xác minh test tích hợp

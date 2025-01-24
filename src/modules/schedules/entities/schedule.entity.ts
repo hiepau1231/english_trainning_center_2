@@ -8,9 +8,9 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-import { Classroom } from '../../rooms/entities/classroom.entity';
-import { Class } from 'src/modules/classes/entities/class.entity';
-import { Shift } from 'src/modules/shifts/entities/shift.entity';
+import { Classroom } from '@modules/rooms/entities/classroom.entity';
+import { Class } from '@modules/classes/entities/class.entity';
+import { Shift } from '@modules/shifts/entities/shift.entity';
 
 @Entity('schedules')
 export class Schedule {

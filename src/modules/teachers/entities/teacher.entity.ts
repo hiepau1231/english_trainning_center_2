@@ -1,5 +1,5 @@
-import { Class } from 'src/modules/classes/entities/class.entity';
-import { Level } from 'src/modules/levels/entities/level.entity';
+import { Class } from '@modules/classes/entities/class.entity';
+import { Level } from '@modules/levels/entities/level.entity';
 import {
   Entity,
   Column,
@@ -10,7 +10,7 @@ import {
   JoinTable,
   OneToMany,
 } from 'typeorm';
-import { ClassTeacher } from '../../classes/entities/class-teacher.entity';
+import { ClassTeacher } from '@modules/classes/entities/class-teacher.entity';
 
 @Entity('teachers')
 export class Teacher {

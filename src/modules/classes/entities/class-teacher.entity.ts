@@ -8,7 +8,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Class } from './class.entity';
-import { Teacher } from '../../teachers/entities/teacher.entity';
+import { Teacher } from '@modules/teachers/entities/teacher.entity';
 import { TeacherRole } from '../enums/teacher-role.enum';
 
 @Entity('class_teachers')

@@ -1,4 +1,4 @@
-import { Class } from 'src/modules/classes/entities/class.entity';
+import { Class } from '@modules/classes/entities/class.entity';
 import {
   Entity,
   Column,

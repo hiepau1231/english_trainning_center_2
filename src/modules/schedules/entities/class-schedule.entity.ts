@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { Class } from '../../classes/entities/class.entity';
-import { Teacher } from '../../teachers/entities/teacher.entity';
-import { Classroom } from '../../rooms/entities/classroom.entity';
+import { Class } from '@modules/classes/entities/class.entity';
+import { Teacher } from '@modules/teachers/entities/teacher.entity';
+import { Classroom } from '@modules/rooms/entities/classroom.entity';
 
 @Entity('class_schedules')
 export class ClassSchedule {
@@ -50,20 +50,39 @@ export class ClassSchedule {
     @UpdateDateColumn({ name: 'updated_at' })
     updatedAt: Date;
 
-    // Utility methods for scheduling validation
-    
     /**
-     * Kiểm tra xem một ngày cụ thể có nằm trong khoảng lịch học không
+     * Check if a specific date falls within the schedule period
      */
-    isDateInSchedule(date: Date): boolean {
-        return date >= this.startDate && date <= this.endDate;
+    isDateInSchedule(date: Date | null | undefined): boolean {
+        if (!date) {
+            throw new Error('Date cannot be null or undefined');
+        }
+
+        if (!(date instanceof Date) || isNaN(date.getTime())) {
+            throw new Error('Invalid date input');
+        }
+
+        if (!(this.startDate instanceof Date) || !(this.endDate instanceof Date)) {
+            throw new Error('Schedule dates are not properly initialized');
+        }
+
+        // Normalize dates to remove time component for comparison
+        const normalizedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        const normalizedStart = new Date(this.startDate.getFullYear(), this.startDate.getMonth(), this.startDate.getDate());
+        const normalizedEnd = new Date(this.endDate.getFullYear(), this.endDate.getMonth(), this.endDate.getDate());
+
+        return normalizedDate >= normalizedStart && normalizedDate <= normalizedEnd;
     }
 
     /**
-     * Kiểm tra xung đột với một lịch học khác
+     * Check for conflict with another schedule
      */
     hasConflictWith(other: ClassSchedule): boolean {
-        // Kiểm tra ngày
+        if (!other) {
+            throw new Error('Cannot check conflict with null or undefined schedule');
+        }
+
+        // Check date overlap
         const hasDateOverlap = !(
             this.endDate < other.startDate ||
             this.startDate > other.endDate
@@ -71,10 +90,10 @@ export class ClassSchedule {
 
         if (!hasDateOverlap) return false;
 
-        // Kiểm tra thứ trong tuần
+        // Check day of week
         if (this.dayOfWeek !== other.dayOfWeek) return false;
 
-        // Kiểm tra thời gian
+        // Check time overlap
         const thisStart = new Date(`1970-01-01T${this.startTime}`);
         const thisEnd = new Date(`1970-01-01T${this.endTime}`);
         const otherStart = new Date(`1970-01-01T${other.startTime}`);
