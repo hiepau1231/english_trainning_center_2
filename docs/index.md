@@ -2,13 +2,20 @@
 
 ## Cấu Trúc Tài Liệu
 
-### 1. [API Documentation](./api.md)
+### 1. [Chi Tiết Triển Khai](./implementation.md)
+- Tối ưu truy vấn với QueryBuilder
+- Repository pattern và cách tách code
+- Error handling & validation
+- Caching strategy
+- Kết quả đạt được và hướng phát triển
+
+### 2. [API Documentation](./api.md)
 - Chi tiết về các endpoints
 - Request/Response formats
 - Error handling
 - Query parameters
 
-### 2. [Testing Guide](./testing.md)
+### 3. [Testing Guide](./testing.md)
 - Cấu trúc test
 - Repository tests
 - Service tests
@@ -16,7 +23,7 @@
 - Coverage requirements
 - Best practices
 
-### 3. [Import Guide](./imports.md)
+### 4. [Import Guide](./imports.md)
 - Path aliases
 - Import conventions
 - Circular dependency handling
